@@ -1,0 +1,16 @@
+# Donor HLA Typing (molecular 2-field notation)
+# One allele per line. Lines starting with # are comments.
+A*02:01
+A*30:01
+B*07:02
+B*44:02
+C*05:01
+C*07:02
+DRB1*04:01
+DRB1*15:01
+DRB4*01:01
+DRB5*01:01
+DQA1*03:01
+DQB1*03:02
+DPA1*01:03
+DPB1*04:01
