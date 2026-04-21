@@ -93,8 +93,8 @@ This demo targets the **HAML 0.6.1 draft schema** (`schema/haml__version_0_6_1.x
 
 All data in `data/` is **synthetic** and does not represent real patients. The sample includes:
 
-- **Class I panel** (87 target beads): HLA-A, B, C with 9 positive, 3 borderline, 75 negative beads
-- **Class II panel** (56 target beads): HLA-DR, DQ, DP with DQ and DR positives
+- **Class I panel** (97 target beads + NC + PC = 99 rows): HLA-A, B, C with 9 positive, 3 borderline, 85 negative beads
+- **Class II panel** (94 target beads + NC + PC = 96 rows): HLA-DR, DQ, DP with 7 positive (5 DR4 + 2 DQ)
 - **Donor typing** (14 alleles): Creates 5 DSA matches across both classes
 
 ## Repository Structure
