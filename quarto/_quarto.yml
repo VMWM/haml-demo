@@ -1,0 +1,15 @@
+project:
+  type: default
+  output-dir: _output
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    code-tools: true
+    embed-resources: true
+
+execute:
+  enabled: true

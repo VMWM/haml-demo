@@ -1,0 +1,236 @@
+---
+title: "Working with HAML: Converting and Processing HLA Antibody Data"
+subtitle: "Demo scripts for the HAML 1.0 specification"
+author:
+  - name: Vanessa W. Menard
+    affiliation: Tulane University School of Medicine
+  - name: Loren Gragert
+    affiliation: Tulane University School of Medicine
+  - name: Eric Spierings
+    affiliation: University Medical Center Utrecht
+  - name: Ben Matern
+    affiliation: National Marrow Donor Program
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    code-tools: true
+    embed-resources: true
+execute:
+  warning: false
+---
+
+## Introduction
+
+This document walks through three fundamental operations with HLA Antibody Markup Language (HAML):
+
+1. **Convert** a laboratory CSV export into standardized HAML XML
+2. **Analyze** the HAML file by applying an MFI threshold to classify beads
+3. **Virtual Crossmatch** using HAML antibody data and donor HLA typing
+
+Each section is self-contained and can be adapted for your own data.
+
+### What is HAML?
+
+HLA single antigen bead (SAB) assays are the standard technology for identifying HLA antibodies in transplant patients. Every transplant center in the US uses them. But the raw data, mean fluorescence intensity (MFI) values for each bead, is exported in vendor-specific CSV formats that differ between One Lambda (Thermo Fisher), Werfen (Immucor), and institutional laboratory information systems.
+
+**HAML** (HLA Antibody Markup Language) is an XML-based standard that provides a single, vendor-neutral format for SAB assay results. It captures raw MFI values, bead metadata, assay kit information, adjusted calculations, and interpretation results. HAML was developed by the [IHIW](https://www.ihiw.org/) Clinical Histocompatibility Laboratory Informatics Working Group.
+
+**Schema version:** This document targets the HAML 0.6.1 draft schema, which will become HAML 1.0 upon publication.
+
+```{python}
+#| label: setup
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path("..").resolve()
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
+
+import pandas as pd
+from lxml import etree
+```
+
+## Part 1: Converting SAB Data to HAML
+
+The most common starting point is a CSV export from laboratory analysis software. Here we convert a One Lambda HLA Fusion export into HAML XML.
+
+### Input: One Lambda Fusion CSV
+
+The standard export has one row per bead with columns for sample ID, bead ID, HLA specificity, raw MFI, and bead count. Beads 1 and 2 are negative and positive controls (no specificity assigned).
+
+```{python}
+#| label: load-csv
+csv_path = REPO_ROOT / "data" / "sample_sab_class1.csv"
+df_input = pd.read_csv(csv_path)
+
+print(f"Input: {csv_path.name}")
+print(f"Beads: {len(df_input)} rows, {df_input['Sample ID'].nunique()} sample(s)\n")
+df_input.head(10)
+```
+
+### Conversion
+
+The converter maps each CSV row into the HAML document hierarchy. Each bead becomes a `target-bead-observation` element with `bead-info` (HLA specificity) and `bead-raw-data` (MFI value).
+
+```{python}
+#| label: convert
+from csv_to_haml import read_fusion_csv, build_haml, validate_haml
+
+beads = read_fusion_csv(csv_path)
+root = build_haml(beads, reporting_center="HAML Demo Laboratory")
+
+xml_bytes = etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="UTF-8")
+xml_str = xml_bytes.decode("utf-8")
+
+lines = xml_str.split("\n")
+print(f"Generated HAML XML: {len(lines)} lines\n")
+print("\n".join(lines[:40]))
+print(f"\n... ({len(lines) - 40} more lines)")
+```
+
+### Schema Validation
+
+The XSD schema enforces structural correctness. Any HAML consumer can validate a file before processing.
+
+```{python}
+#| label: validate
+is_valid, errors = validate_haml(root)
+if is_valid:
+    print("XSD Validation: PASSED")
+else:
+    print(f"XSD Validation: FAILED\n{errors}")
+```
+
+## Part 2: MFI Threshold Classification
+
+Now we read the HAML file back and classify each bead by applying a 2,000 MFI threshold.
+
+```{python}
+#| label: analyze
+from haml_analyzer import parse_haml_beads, classify_bead, extract_locus
+
+output_dir = REPO_ROOT / "output"
+output_dir.mkdir(exist_ok=True)
+haml_path = output_dir / "demo_class1.haml.xml"
+with open(haml_path, "w") as f:
+    f.write(xml_str)
+
+all_beads = parse_haml_beads(haml_path)
+target_beads = [b for b in all_beads if b["bead_type"] == "target"]
+
+nc = next((b for b in all_beads if b["bead_type"] == "negative-control"), None)
+pc = next((b for b in all_beads if b["bead_type"] == "positive-control"), None)
+
+THRESHOLD = 2000
+
+print(f"Target beads: {len(target_beads)}")
+print(f"NC: {nc['raw_mfi']:.0f}  |  PC: {pc['raw_mfi']:.0f}  |  PC/NC: {pc['raw_mfi']/nc['raw_mfi']:.1f}")
+print(f"Threshold: {THRESHOLD} MFI\n")
+
+rows = []
+for b in target_beads:
+    rows.append({
+        "specificity": b["hla_specificity"],
+        "locus": extract_locus(b["hla_specificity"]),
+        "raw_mfi": b["raw_mfi"],
+        "classification": classify_bead(b["raw_mfi"], THRESHOLD),
+    })
+df = pd.DataFrame(rows)
+
+positives = df[df["classification"] == "Positive"].sort_values("raw_mfi", ascending=False)
+print(f"Positive: {len(positives)}  |  Borderline: {(df['classification']=='Borderline').sum()}  |  Negative: {(df['classification']=='Negative').sum()}\n")
+positives[["specificity", "locus", "raw_mfi"]]
+```
+
+### MFI Distribution
+
+```{python}
+#| label: fig-mfi-distribution
+#| fig-cap: "MFI distribution across all Class I beads with threshold classification"
+
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+
+colors = {"Positive": "#c0392b", "Borderline": "#f39c12", "Negative": "#7f8c8d"}
+ax = axes[0]
+for cls in ["Negative", "Borderline", "Positive"]:
+    subset = df[df["classification"] == cls]
+    ax.hist(subset["raw_mfi"], bins=30, alpha=0.7, label=cls, color=colors[cls])
+ax.axvline(x=THRESHOLD, color="#2c3e50", linestyle="--", linewidth=2, label=f"Threshold ({THRESHOLD})")
+ax.axvline(x=THRESHOLD*0.5, color="#95a5a6", linestyle=":", linewidth=1, label=f"Borderline ({int(THRESHOLD*0.5)})")
+ax.set_xlabel("Raw MFI")
+ax.set_ylabel("Number of Beads")
+ax.set_title("MFI Distribution")
+ax.legend(fontsize=8)
+ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
+
+ax2 = axes[1]
+summary = df.groupby("locus")["classification"].value_counts().unstack(fill_value=0)
+summary = summary.reindex(columns=["Positive", "Borderline", "Negative"], fill_value=0)
+summary.plot(kind="barh", stacked=True, ax=ax2, color=[colors["Positive"], colors["Borderline"], colors["Negative"]])
+ax2.set_xlabel("Number of Beads")
+ax2.set_title("Classification by HLA Locus")
+ax2.legend(fontsize=8)
+
+plt.tight_layout()
+plt.show()
+```
+
+## Part 3: Simple Virtual Crossmatch
+
+A virtual crossmatch (VXM) predicts whether a patient's antibodies will react against a specific donor's HLA antigens. The basic logic: any positive antibody matching a donor allele is a donor-specific antibody (DSA), predicting a positive crossmatch.
+
+```{python}
+#| label: vxm
+from simple_vxm import read_donor_typing, identify_dsa, predict_vxm
+
+donor_path = REPO_ROOT / "data" / "sample_donor_typing.txt"
+donor_alleles = read_donor_typing(donor_path)
+
+print("Donor HLA Typing:")
+for allele in sorted(donor_alleles):
+    print(f"  {allele}")
+```
+
+```{python}
+#| label: vxm-results
+# Class I DSA
+dsa_c1 = identify_dsa(all_beads, donor_alleles, threshold=THRESHOLD)
+
+# Class II: convert, parse, find DSA
+csv_path_c2 = REPO_ROOT / "data" / "sample_sab_class2.csv"
+beads_c2 = read_fusion_csv(csv_path_c2)
+root_c2 = build_haml(beads_c2, reporting_center="HAML Demo Laboratory", hla_class="II", catalog="LS2A01")
+haml_c2 = output_dir / "demo_class2.haml.xml"
+with open(haml_c2, "w") as f:
+    f.write(etree.tostring(root_c2, pretty_print=True, xml_declaration=True, encoding="UTF-8").decode())
+dsa_c2 = identify_dsa(parse_haml_beads(haml_c2), donor_alleles, threshold=THRESHOLD)
+
+all_dsa = dsa_c1 + dsa_c2
+
+print(f"MFI Threshold: {THRESHOLD}\n")
+if all_dsa:
+    dsa_df = pd.DataFrame(all_dsa).sort_values("raw_mfi", ascending=False)
+    print(f"Donor-Specific Antibodies ({len(all_dsa)} found):\n")
+    print(dsa_df[["specificity", "locus", "raw_mfi", "match_type"]].to_string(index=False))
+
+print(f"\nVirtual Crossmatch Prediction: {predict_vxm(all_dsa)}")
+```
+
+## Discussion
+
+This notebook demonstrated the core value of HAML: **a single workflow that works regardless of which laboratory produced the data**. The same analyzer and VXM scripts work on HAML files generated from any vendor's CSV export, because the HAML schema standardizes the representation.
+
+### What This Demo Does NOT Cover
+
+Clinical antibody interpretation involves locus-specific thresholds, cross-reactive group (CREG) analysis, artifact detection (prozone, complement interference), historical antibody patterns, platform concordance, and eplet-level molecular analysis. These capabilities require domain-specific algorithms beyond simple threshold classification.
+
+### Next Steps
+
+- **HAML 1.0 finalization:** The schema used here (0.6.1 draft) includes new cell-based assay support for flow crossmatch and CDC data.
+- **Adjusted MFI and interpretations:** HAML supports multiple adjusted-data entries and interpretation entries per bead, enabling laboratories to share analytical reasoning alongside raw data.
+- **IHIW Converters:** Production-grade converters are maintained at [github.com/IHIW/Converters](https://github.com/IHIW/Converters).
