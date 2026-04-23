@@ -24,11 +24,13 @@ These scripts are intentionally simple. They demonstrate the HAML format, not pr
 
 ## Quick Start
 
-**Requirements:** Python 3.10+, lxml, pandas, matplotlib
+**Requirements:** Python 3.10+, lxml, pandas, matplotlib, ipykernel (for notebooks)
 
 ```bash
 git clone https://github.com/VMWM/haml-demo.git
 cd haml-demo
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
