@@ -21,7 +21,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from haml_analyzer import parse_haml_beads, extract_locus, classify_bead
+from scripts.haml_analyzer import parse_haml_beads, extract_locus, classify_bead
 
 
 def read_donor_typing(filepath):
