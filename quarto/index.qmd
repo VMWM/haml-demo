@@ -1,6 +1,6 @@
 ---
 title: "Working with HAML: Converting and Processing HLA Antibody Data"
-subtitle: "Demo scripts for the HAML 1.0 specification"
+subtitle: "Demo scripts for the HAML 0.5.3 specification"
 author:
   - name: Vanessa W. Menard
     affiliation: Tulane University School of Medicine
@@ -38,7 +38,7 @@ HLA single antigen bead (SAB) assays are the standard technology for identifying
 
 **HAML** (HLA Antibody Markup Language) is an XML-based standard that provides a single, vendor-neutral format for SAB assay results. It captures raw MFI values, bead metadata, assay kit information, adjusted calculations, and interpretation results. HAML was developed by the [IHIW](https://www.ihiw.org/) Clinical Histocompatibility Laboratory Informatics Working Group.
 
-**Schema version:** This document targets the HAML 0.6.1 draft schema, which will become HAML 1.0 upon publication.
+**Schema version:** This document targets HAML 0.5.3, the current version of the specification.
 
 ```{python}
 #| label: setup
@@ -231,6 +231,6 @@ Clinical antibody interpretation involves locus-specific thresholds, cross-react
 
 ### Next Steps
 
-- **HAML 1.0 finalization:** The schema used here (0.6.1 draft) includes new cell-based assay support for flow crossmatch and CDC data.
+- **HAML specification:** The current schema (0.5.3) is maintained at [github.com/immunomath/haml](https://github.com/immunomath/haml). Watch that repository for future version releases.
 - **Adjusted MFI and interpretations:** HAML supports multiple adjusted-data entries and interpretation entries per bead, enabling laboratories to share analytical reasoning alongside raw data.
 - **IHIW Converters:** Production-grade converters are maintained at [github.com/IHIW/Converters](https://github.com/IHIW/Converters).

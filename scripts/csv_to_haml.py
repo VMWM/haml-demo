@@ -9,13 +9,13 @@ HAML XSD schema.
 Input CSV columns (One Lambda HLA Fusion export):
     Sample ID, Bead ID, Specificity, Raw Value, BCM, Ranking, Bead Count
 
-Output: HAML XML file conforming to the HAML 0.6.1 draft schema.
+Output: HAML XML file conforming to the HAML 0.5.3 schema.
 
 Usage:
     python csv_to_haml.py data/sample_sab_class1.csv -o output/demo.haml.xml
     python csv_to_haml.py data/sample_sab_class1.csv --validate
 
-Part of the HAML 1.0 specification demo scripts.
+Part of the HAML specification demo scripts.
 """
 
 import argparse
@@ -29,10 +29,10 @@ from lxml import etree
 
 # HAML namespace and version
 HAML_NS = "urn:HAML.Namespace"
-HAML_VERSION = "0.5.3"  # XSD declares this; will become 1.0 on publication
+HAML_VERSION = "0.5.3"
 NSMAP = {None: HAML_NS}
 
-SCHEMA_PATH = Path(__file__).parent.parent / "schema" / "haml__version_0_6_1.xsd"
+SCHEMA_PATH = Path(__file__).parent.parent / "schema" / "haml__version_0_5_3.xsd"
 
 
 def sub(parent, tag, text=None):

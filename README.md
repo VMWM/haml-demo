@@ -1,6 +1,6 @@
 # HAML Demo: Working with HLA Antibody Data
 
-Demo scripts for the [HAML 1.0 specification](https://github.com/immunomath/haml) showing how to convert, analyze, and use HLA antibody data in a standardized format.
+Demo scripts for the [HAML specification](https://github.com/immunomath/haml) showing how to convert, analyze, and use HLA antibody data in a standardized format.
 
 ## Background
 
@@ -83,10 +83,9 @@ open _output/index.html
 
 ## Schema
 
-This demo targets the **HAML 0.6.1 draft schema** (`schema/haml__version_0_6_1.xsd`), which will become HAML 1.0 upon publication. Key features of this version:
+This demo targets **HAML 0.5.3** (`schema/haml__version_0_5_3.xsd`), the current version of the specification maintained at [github.com/immunomath/haml](https://github.com/immunomath/haml). Key features:
 
 - Bead-based solid phase assay support (SAB, screening panels)
-- Cell-based assay support (flow crossmatch, CDC) -- new in 0.6.1
 - Multiple adjusted MFI calculations and interpretations per bead
 - Assay kit metadata (manufacturer, lot, catalog, software)
 - XSD validation for structural correctness
@@ -113,7 +112,7 @@ haml-demo/
 │   ├── index.qmd               # Quarto manuscript document
 │   └── _quarto.yml             # Quarto project config
 ├── schema/
-│   └── haml__version_0_6_1.xsd # HAML XML Schema Definition
+│   └── haml__version_0_5_3.xsd # HAML XML Schema Definition
 ├── data/
 │   ├── sample_sab_class1.csv   # Synthetic Class I SAB data
 │   ├── sample_sab_class2.csv   # Synthetic Class II SAB data
