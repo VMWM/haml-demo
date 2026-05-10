@@ -25,6 +25,13 @@ Scripts 1–3 work on the synthetic single-patient data in `data/`. Script 4 req
 
 These scripts are intentionally simple. They demonstrate the HAML format, not production-grade clinical analysis. Real-world antibody interpretation involves cross-reactive group analysis, artifact detection, historical patterns, platform concordance, and eplet-level matching.
 
+## Documentation
+
+| Document | What It Covers |
+|---|---|
+| [`docs/column_mapping.md`](docs/column_mapping.md) | SAB CSV → HAML field mapping for One Lambda HLA Fusion and Werfen MATCH IT formats; raw-MFI vs adjusted-mfi distinction; NC/PC encoding; kit metadata; HLA typing |
+| [`docs/hlabassist_workflow.md`](docs/hlabassist_workflow.md) | End-to-end workflow: how HLAbAssist moves from raw SAB CSV through HAML to algorithm results, covering both the single-patient web UI path and the benchmark batch path |
+
 ## Quick Start
 
 **Requirements:** Python 3.10+, lxml, pandas, matplotlib, ipykernel (for notebooks)
@@ -133,7 +140,8 @@ haml-demo/
 │   ├── sample_sab_class2.csv   # Synthetic Class II SAB data
 │   └── sample_donor_typing.txt # Donor HLA typing for VXM demo
 ├── docs/
-│   └── column_mapping.md       # SAB CSV → HAML field mapping (One Lambda + Werfen)
+│   ├── column_mapping.md           # SAB CSV → HAML field mapping (One Lambda + Werfen)
+│   └── hlabassist_workflow.md      # End-to-end workflow: CSV → HAML → algorithm → results
 ├── output/                     # Generated HAML XML (gitignored)
 ├── requirements.txt
 └── README.md
