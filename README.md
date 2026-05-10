@@ -132,6 +132,8 @@ haml-demo/
 │   ├── sample_sab_class1.csv   # Synthetic Class I SAB data
 │   ├── sample_sab_class2.csv   # Synthetic Class II SAB data
 │   └── sample_donor_typing.txt # Donor HLA typing for VXM demo
+├── docs/
+│   └── column_mapping.md       # SAB CSV → HAML field mapping (One Lambda + Werfen)
 ├── output/                     # Generated HAML XML (gitignored)
 ├── requirements.txt
 └── README.md
