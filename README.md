@@ -19,6 +19,9 @@ This repository contains three standalone Python scripts and an interactive note
 | 1 | `scripts/csv_to_haml.py` | **Convert** a One Lambda Fusion SAB CSV export to validated HAML XML |
 | 2 | `scripts/haml_analyzer.py` | **Analyze** a HAML file: apply an MFI threshold, classify beads as positive/borderline/negative, summarize by HLA locus |
 | 3 | `scripts/simple_vxm.py` | **Virtual Crossmatch**: given a HAML file and donor HLA typing, identify donor-specific antibodies (DSA) and predict crossmatch compatibility |
+| 4 | `scripts/benchmark_pipeline.py` | **Benchmark cohort**: parse a multi-patient benchmark HAML file, apply NC-adaptive thresholds per assay, and compute antibody prevalence across the cohort |
+
+Scripts 1–3 work on the synthetic single-patient data in `data/`. Script 4 requires `benchmark_all55.haml.xml`, a 55-case benchmark file available for download from [HLAbAssist.app](https://hlabassist.app) after login.
 
 These scripts are intentionally simple. They demonstrate the HAML format, not production-grade clinical analysis. Real-world antibody interpretation involves cross-reactive group analysis, artifact detection, historical patterns, platform concordance, and eplet-level matching.
 
@@ -65,6 +68,17 @@ python simple_vxm.py ../output/demo.haml.xml ../data/sample_donor_typing.txt
 
 Compares the patient's positive antibodies against a donor's HLA typing to identify DSA and predict VXM compatibility. Supports exact matching and heterodimer chain matching for DQ/DP beads.
 
+### 4. Analyze the Benchmark Cohort (requires login at HLAbAssist.app)
+
+Download `benchmark_all55.haml.xml` from [HLAbAssist.app](https://hlabassist.app), then:
+
+```bash
+python scripts/benchmark_pipeline.py haml/benchmark_all55.haml.xml
+python scripts/benchmark_pipeline.py haml/benchmark_all55.haml.xml --case-detail --current-only
+```
+
+The file contains 55 benchmark cases (61 HAML patient entries: 56 current + 5 historic timepoint entries) drawn from ASHI proficiency testing materials. The pipeline applies an NC-adaptive MFI threshold to each assay and computes antibody prevalence by HLA locus across the cohort.
+
 ## Interactive Notebook
 
 For a guided walkthrough with narrative, visualizations, and both Class I + Class II data:
@@ -105,7 +119,8 @@ haml-demo/
 ├── scripts/
 │   ├── csv_to_haml.py          # CSV → HAML converter with XSD validation
 │   ├── haml_analyzer.py        # HAML parser + MFI threshold classifier
-│   └── simple_vxm.py           # DSA identification + VXM prediction
+│   ├── simple_vxm.py           # DSA identification + VXM prediction
+│   └── benchmark_pipeline.py   # Multi-patient cohort analysis (requires benchmark download)
 ├── notebooks/
 │   └── haml_demo.ipynb         # Interactive Jupyter walkthrough
 ├── quarto/
