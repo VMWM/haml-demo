@@ -101,13 +101,6 @@ jupyter notebook notebooks/benchmark_conversion.ipynb
 jupyter notebook notebooks/user_upload_conversion.ipynb
 ```
 
-A Quarto version is also available in `quarto/index.qmd` for manuscript-quality rendering:
-
-```bash
-cd quarto
-quarto render index.qmd
-open _output/index.html
-```
 
 ## Schema
 
@@ -147,9 +140,6 @@ haml-demo/
 │   ├── haml_demo.ipynb                 # Core HAML walkthrough
 │   ├── benchmark_conversion.ipynb      # Benchmark → multi-patient Extended HAML
 │   └── user_upload_conversion.ipynb    # User CSV → Extended HAML (PHI scrubbing)
-├── quarto/
-│   ├── index.qmd               # Quarto manuscript document
-│   └── _quarto.yml             # Quarto project config
 ├── schema/
 │   └── haml__version_0_5_3.xsd # HAML XML Schema Definition
 ├── data/
