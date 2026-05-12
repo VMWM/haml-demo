@@ -1,5 +1,17 @@
 # HLAbAssist HAML Workflow: End-to-End
 
+HLAbAssist is a clinical decision-support tool for HLA antibody interpretation in kidney
+transplantation. HAML is the data format at the center of every analysis. This document
+describes how HAML moves through HLAbAssist from raw SAB (single-antigen bead) data to
+algorithm results — both for individual patient analysis and for the ASHI Consensus
+Benchmark.
+
+HLAbAssist extends HAML 0.5.3 with four additions: a `<recipient-profile>` element for
+patient HLA typing, a `<donor-profile>` element for donor HLA typing, an
+`<interpretation-results>` element for algorithm output, and `<extended-bead-data>`
+attributes for vendor-specific bead fields. The full schema reference is in
+[`docs/extended_haml_schema.md`](extended_haml_schema.md).
+
 This document explains how HAML moves through HLAbAssist from raw SAB data to
 algorithm results — covering both the single-patient web UI path and the
 benchmark batch path. It is the reference for understanding what the algorithm
@@ -270,6 +282,7 @@ routes through `_read_csv_upload()`.
 
 ## Related resources
 
+- [`docs/extended_haml_schema.md`](extended_haml_schema.md) — Extended HAML schema: all extensions, rationale, and examples
 - [`docs/column_mapping.md`](column_mapping.md) — SAB CSV column → HAML field mapping
 - [Research_Manual Ch. 21](https://github.com/VMWM/Anti-HLA_Research) — full I/O contract, PHI scrubber architecture, Werfen round-trip fidelity
 - [HAML specification](https://github.com/immunomath/haml) — schema source (immunomath/haml)
