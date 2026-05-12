@@ -5,6 +5,33 @@ accommodate: recipient and donor HLA typing, multi-vendor bead data with
 instrument-native ratio values, and algorithm interpretation results. This document
 describes every extension, its rationale, and the design decisions behind it.
 
+## Standards context
+
+The HAML specification positions HLA antibody data exchange on the antibody side of
+immunogenetics, occupying the same role that HML occupies on the genotype side.
+HML is the transport format for HLA genotyping results (NGS allele data, GL strings,
+allele ambiguity); HAML is the transport format for antibody assay observations and
+their interpretation. The two standards are complementary and intentionally separate.
+
+The extensions described here are additions to the antibody side of that division,
+not to the genotype side. `<recipient-profile>` and `<donor-profile>` carry the
+minimal HLA typing context needed for antibody interpretation: self-antigen exclusion
+and donor-specific antibody identification. This is interpretation input, not a
+genotyping report. It belongs in HAML, not HML.
+
+HAML 1.0 introduces a structured report header for patient, sample, and laboratory
+metadata required by accreditation frameworks (EFI, ASHI). That header is
+administrative provenance. Our typing extensions serve a different purpose: they
+provide the algorithmic context required to produce a clinically meaningful antibody
+interpretation from raw bead data. The two are distinct layers.
+
+`<donor-profile>` in particular addresses a gap the HAML 1.0 manuscript identifies
+explicitly: flow crossmatch and virtual crossmatch support are an active extension
+pathway in the current specification. The donor typing required to evaluate a virtual
+crossmatch against a specific potential donor is not yet formally defined in the
+schema. HLAbAssist is a production use case demonstrating what that extension needs
+to contain.
+
 This is a real-world production schema. HLAbAssist uses it in two contexts:
 
 1. **Single-patient web UI** — the browser assembles Extended HAML from a user-uploaded
