@@ -29,6 +29,7 @@ These scripts are intentionally simple. They demonstrate the HAML format, not pr
 
 | Document | What It Covers |
 |---|---|
+| [`docs/extended_haml_schema.md`](docs/extended_haml_schema.md) | Extended HAML schema reference: every extension element (`<recipient-profile>`, `<donor-profile>`, `<interpretation-results>`, `<extended-bead-data>`), design rationale, multi-vendor assay splitting, and benchmark file structure |
 | [`docs/column_mapping.md`](docs/column_mapping.md) | SAB CSV → HAML field mapping for One Lambda HLA Fusion and Werfen MATCH IT formats; raw-MFI vs adjusted-mfi distinction; NC/PC encoding; kit metadata; HLA typing |
 | [`docs/hlabassist_workflow.md`](docs/hlabassist_workflow.md) | End-to-end workflow: how HLAbAssist moves from raw SAB CSV through HAML to algorithm results, covering both the single-patient web UI path and the benchmark batch path |
 
@@ -111,6 +112,14 @@ This demo targets **HAML 0.5.3** (`schema/haml__version_0_5_3.xsd`), the current
 - Assay kit metadata (manufacturer, lot, catalog, software)
 - XSD validation for structural correctness
 
+HLAbAssist extends HAML 0.5.3 with a non-namespaced `<extended-haml>` wrapper that adds
+four sibling elements to the standard `<haml>` root: `<recipient-profile>` (patient HLA
+typing for self-antigen exclusion), `<donor-profile>` (donor HLA typing for DSA and VXM),
+`<interpretation-results>` (algorithm output), and `<extended-bead-data>` at the bead
+level (vendor-specific ratio values and raw instrument counts). Plain HAML 0.5.3 files are
+also accepted. See [`docs/extended_haml_schema.md`](docs/extended_haml_schema.md) for the
+full schema reference.
+
 ## Sample Data
 
 All data in `data/` is **synthetic** and does not represent real patients. The sample includes:
@@ -140,6 +149,7 @@ haml-demo/
 │   ├── sample_sab_class2.csv   # Synthetic Class II SAB data
 │   └── sample_donor_typing.txt # Donor HLA typing for VXM demo
 ├── docs/
+│   ├── extended_haml_schema.md     # Extended HAML schema reference
 │   ├── column_mapping.md           # SAB CSV → HAML field mapping (One Lambda + Werfen)
 │   └── hlabassist_workflow.md      # End-to-end workflow: CSV → HAML → algorithm → results
 ├── output/                     # Generated HAML XML (gitignored)
