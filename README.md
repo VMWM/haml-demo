@@ -87,12 +87,18 @@ python scripts/benchmark_pipeline.py haml/benchmark_all55.haml.xml --case-detail
 
 The file contains 55 benchmark cases (61 HAML patient entries: 56 current + 5 historic timepoint entries) drawn from ASHI proficiency testing materials. The pipeline applies an NC-adaptive MFI threshold to each assay and computes antibody prevalence by HLA locus across the cohort.
 
-## Interactive Notebook
+## Interactive Notebooks
 
-For a guided walkthrough with narrative, visualizations, and both Class I + Class II data:
+| Notebook | What It Demonstrates |
+|---|---|
+| [`notebooks/haml_demo.ipynb`](notebooks/haml_demo.ipynb) | Core HAML workflow: convert a CSV, analyze MFI values, run a simple VXM |
+| [`notebooks/benchmark_conversion.ipynb`](notebooks/benchmark_conversion.ipynb) | How the ASHI Consensus Benchmark (55 cases) was converted to a multi-patient Extended HAML file: vendor suffixes, multi-assay splitting, historic timepoints |
+| [`notebooks/user_upload_conversion.ipynb`](notebooks/user_upload_conversion.ipynb) | How HLAbAssist converts a user-uploaded SAB CSV to Extended HAML in the browser: PHI detection, pseudo-ID assignment, recipient/donor typing, HAML assembly |
 
 ```bash
 jupyter notebook notebooks/haml_demo.ipynb
+jupyter notebook notebooks/benchmark_conversion.ipynb
+jupyter notebook notebooks/user_upload_conversion.ipynb
 ```
 
 A Quarto version is also available in `quarto/index.qmd` for manuscript-quality rendering:
@@ -138,7 +144,9 @@ haml-demo/
 │   ├── simple_vxm.py           # DSA identification + VXM prediction
 │   └── benchmark_pipeline.py   # Multi-patient cohort analysis (requires benchmark download)
 ├── notebooks/
-│   └── haml_demo.ipynb         # Interactive Jupyter walkthrough
+│   ├── haml_demo.ipynb                 # Core HAML walkthrough
+│   ├── benchmark_conversion.ipynb      # Benchmark → multi-patient Extended HAML
+│   └── user_upload_conversion.ipynb    # User CSV → Extended HAML (PHI scrubbing)
 ├── quarto/
 │   ├── index.qmd               # Quarto manuscript document
 │   └── _quarto.yml             # Quarto project config
